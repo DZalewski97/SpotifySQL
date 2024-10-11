@@ -18,7 +18,7 @@ public class SpotifyController {
         this.spotifyAlbumService = spotifyAlbumService;
     }
 
-    @GetMapping("/artists/{authorName}")
+    @GetMapping("/spotify/album/{authorName}")
     public String getAlbumsByAuthor(@PathVariable String authorName) {
         return spotifyAlbumService.getAlbumsByAuthor(authorName);
     }

@@ -16,10 +16,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/hello").authenticated()  // Wymaga autoryzacji dla /hello
-                        .anyRequest().permitAll()               // Pozwól na dostęp do reszty
+                        .requestMatchers("/hello").authenticated()
+                        .anyRequest().permitAll()
                 )
-                .oauth2Login(); // Użycie OAuth2 do logowania
+                .oauth2Login();
 
         return http.build();
     }
