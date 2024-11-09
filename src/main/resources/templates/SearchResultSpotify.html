@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SearchSpotify</title>
+    <style>
+        body {
+            background-color: #000000; /* Czarny kolor tła */
+            color: #CCCCCC; /* Biały kolor tekstu */
+
+        }
+    </style>
+</head>
+<body>
+<h1>Search Track</h1>
+<form th:action="@{/spotify/search/submit}" method="get">
+    <label for="trackSearch">Track Name:</label>
+    <input type="text" id="trackSearch" name="trackSearch" required>
+    <button type="submit">Search</button>
+</form>
+<h2>Show Library</h2>
+<form th:action="@{/spotify/MySQL/submit}" method="get">
+    <button type="submit">Show Library</button>
+</form>
+<h3>Album List for Author</h3>
+
+<table  border = "2">
+    <thead>
+    <tr>
+        <th>Track Name</th>
+        <th>Album Name</th>
+        <th>Album Image</th>
+        <th>Rating</th>
+        <th>Add track</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="album : ${albumsData}">
+        <form th:action="@{/spotify/MySQL/add}" method="post">
+            <td>
+                <input type="hidden" name="trackName" th:value="${album['trackName']}" />
+                <span th:text="${album['trackName']}">Track Name</span>
+            </td>
+            <td>
+                <input type="hidden" name="albumName" th:value="${album['albumName']}" />
+                <span th:text="${album['albumName']}">Album Name</span>
+            </td>
+            <td>
+                <input type="hidden" name="albumImage" th:value="${album['imageURL']}" />
+                <img th:src="${album['imageURL']}" alt="Album Image" width="100"/>
+            </td>
+            <td>
+                <select name="rating" required>
+                    <option th:value="0" th:text="0"></option>
+                    <option th:value="1" th:text="1"></option>
+                    <option th:value="2" th:text="2"></option>
+                    <option th:value="3" th:text="3"></option>
+                    <option th:value="4" th:text="4"></option>
+                    <option th:value="5" th:text="5"></option>
+                    <option th:value="6" th:text="6"></option>
+                    <option th:value="7" th:text="7"></option>
+                    <option th:value="8" th:text="8"></option>
+                    <option th:value="9" th:text="9"></option>
+                    <option th:value="10" th:text="10"></option>
+                </select>
+            </td>
+            <td>
+                <button type="submit">Add track</button>
+            </td>
+        </form>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

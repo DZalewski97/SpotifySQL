@@ -1,36 +1,36 @@
 package Zalewa.SpotifySQL;
 
 
-import com.nimbusds.jose.shaded.gson.*;
+import com.nimbusds.jose.shaded.gson.Gson;
+import com.nimbusds.jose.shaded.gson.JsonArray;
+import com.nimbusds.jose.shaded.gson.JsonElement;
+import com.nimbusds.jose.shaded.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
 
-import java.lang.reflect.Array;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
-public class SpotifyAlbum {
+public class SpotifyAlbumServer {
 
     //private final OAuth2AuthorizedClientService authorizedClientService;
     private final SpotifyToken spotifyToken;
 
     @Autowired
-    public SpotifyAlbum(SpotifyToken spotifyToken) {
+    public SpotifyAlbumServer(SpotifyToken spotifyToken) {
         this.spotifyToken = spotifyToken;
     }
 
 
-    public String getAlbumsByAuthor(@PathVariable String authorName) {
+    public List<Map<String, String>> getTracks(String trackSearch) {
 
         String accessToken = spotifyToken.getSpotifyAccessToken();
         System.out.println(accessToken);
@@ -40,21 +40,18 @@ public class SpotifyAlbum {
         httpHeaders.add("Authorization", "Bearer " + accessToken);
         HttpEntity httpEntity = new HttpEntity<>(httpHeaders);
 
-        ResponseEntity<String> exchange = restTemplate.exchange("https://api.spotify.com/v1/search?q=" + authorName + "&type=track&limit=2&offset=0", HttpMethod.GET, httpEntity, String.class);
+        ResponseEntity<String> exchange = restTemplate.exchange("https://api.spotify.com/v1/search?q=" + trackSearch + "&type=track&limit=10&offset=0", HttpMethod.GET, httpEntity, String.class);
         StringBuilder result = new StringBuilder();
         Gson gson = new Gson();
 
 
         JsonObject jsonObject = gson.fromJson(exchange.getBody(), JsonObject.class);
-
-
         JsonObject tracks = jsonObject.getAsJsonObject("tracks");
         JsonArray items = tracks.getAsJsonArray("items"); // items is an array
 
-        String[][] resultRepository = new String[items.size()][3];
+        List<Map<String, String>> resultRepository = new ArrayList<>();
 
-        for (int i = 0; i < items.size(); i++) {
-            JsonElement itemElement = items.get(i);
+        for (JsonElement itemElement : items) {
             JsonObject track = itemElement.getAsJsonObject();
             String trackName = track.get("name").getAsString();
 
@@ -63,15 +60,17 @@ public class SpotifyAlbum {
             JsonArray images = album.getAsJsonArray("images");
             String imageURL = images.get(0).getAsJsonObject().get("url").getAsString();
 
-            resultRepository[i][0] = trackName;
-            resultRepository[i][1] = albumName;
-            resultRepository[i][2] = imageURL;
+            Map<String, String> trackData = new HashMap<>();
+            trackData.put("trackName", trackName);
+            trackData.put("albumName", albumName);
+            trackData.put("imageURL", imageURL);
 
-            result.append("Track: ").append(trackName).append(", Album: ").append(albumName).append(", Image URL: ").append(imageURL).append("\n");
+            resultRepository.add(trackData);
         }
-        System.out.println(Arrays.deepToString(resultRepository));
-        return result.toString();
+
+        resultRepository.forEach(track -> System.out.printf("Track: %s, Album: %s, Image URL: %s%n", track.get("trackName"), track.get("albumName"), track.get("imageURL")));
 
 
+        return resultRepository;
     }
 }

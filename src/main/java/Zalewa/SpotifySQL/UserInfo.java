@@ -17,8 +17,9 @@ public class UserInfo {
         return (OAuth2User) oauth2Token.getPrincipal();
     }
 
-    @GetMapping("/hello")
-    public Principal hello(Principal principal){
+
+    @GetMapping("/userinfo")
+    public Principal userinfo(Principal principal) {
         return principal;
     }
 }

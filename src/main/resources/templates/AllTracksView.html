@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All Tracks</title>
+    <style>
+        body {
+            background-color: #000000; /* Czarny kolor tła */
+            color: #CCCCCC; /* Biały kolor tekstu */
+
+        }
+    </style>
+</head>
+<body>
+<h1>Search Track</h1>
+<form th:action="@{/spotify/search/submit}" method="get">
+    <label for="trackSearch">Track Name:</label>
+    <input type="text" id="trackSearch" name="trackSearch" required>
+    <button type="submit">Search</button>
+</form>
+<h3>All Tracks</h3>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Track</th>
+        <th>Album</th>
+        <th>Album Image</th>
+        <th>Rating</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="track : ${allTracks}">
+        <form th:action="@{/spotify/MySQL/delete}" method="post">
+            <td>
+                <input type="hidden" name="trackName" th:value="${track['Track']}"/>
+                <span th:text="${track['Track']}">Track Name </span>
+
+            </td>
+            <td>
+                <input type="hidden" name="albumName" th:value="${track['Album']}"/>
+                <span th:text="${track['Album']}">Album Name</span>
+            </td>
+            <td>
+                <input type="hidden" name="albumImage" th:value="${track['Album images']}"/>
+                <img th:src="${track['Album images']}" alt="Album image" width="100"/>
+            </td>
+            <td>
+                <input type="hidden" name="rating" th:value="${track['Rating']}"/>
+                <span th:text="${track['Rating']}">Rating</span>
+            </td>
+            <td>
+                <button type="submit">Delete track</button>
+            </td>
+        </form>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
